@@ -1,0 +1,410 @@
+
+# Import tkinter library
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import ttk
+
+# Import barcode reader library
+import pyzbar.pyzbar as pyzbar
+import cv2
+
+# Create a database to store the products
+import sqlite3
+conn = sqlite3.connect('inventory.db')
+c = conn.cursor()
+
+# Create a table for the products
+c.execute("""CREATE TABLE IF NOT EXISTS products (
+    barcode text,
+    name text,
+    quantity integer,
+    alert integer
+    )""")
+conn.commit()
+
+# Define a function to add a product to the database
+def add_product():
+    # Get the values from the entry fields
+    barcode = barcode_entry.get()
+    name = name_entry.get()
+    quantity = quantity_entry.get()
+    alert = alert_entry.get()
+
+    # Check if the values are valid
+    if barcode and name and quantity and alert:
+        try:
+            # Convert the quantity and alert to integers
+            quantity = int(quantity)
+            alert = int(alert)
+
+            # Insert the values into the database
+            c.execute("INSERT INTO products VALUES (?,?,?,?)", (barcode, name, quantity, alert))
+            conn.commit()
+
+            # Clear the entry fields
+            barcode_entry.delete(0, tk.END)
+            name_entry.delete(0, tk.END)
+            quantity_entry.delete(0, tk.END)
+            alert_entry.delete(0, tk.END)
+
+            # Show a success message
+            messagebox.showinfo("Success", "Product added successfully")
+
+        except ValueError:
+            # Show an error message if the quantity or alert are not integers
+            messagebox.showerror("Error", "Quantity and alert must be integers")
+
+    else:
+        # Show an error message if any of the fields are empty
+        messagebox.showerror("Error", "All fields are required")
+
+# Define a function to update a product in the database
+def update_product():
+    # Get the values from the entry fields
+    barcode = barcode_entry.get()
+    name = name_entry.get()
+    quantity = quantity_entry.get()
+    alert = alert_entry.get()
+
+    # Check if the values are valid
+    if barcode and name and quantity and alert:
+        try:
+            # Convert the quantity and alert to integers
+            quantity = int(quantity)
+            alert = int(alert)
+
+            # Update the values in the database
+            c.execute("UPDATE products SET name = ?, quantity = ?, alert = ? WHERE barcode = ?", (name, quantity, alert, barcode))
+            conn.commit()
+
+            # Clear the entry fields
+            barcode_entry.delete(0, tk.END)
+            name_entry.delete(0, tk.END)
+            quantity_entry.delete(0, tk.END)
+            alert_entry.delete(0, tk.END)
+
+            # Show a success message
+            messagebox.showinfo("Success", "Product updated successfully")
+
+        except ValueError:
+            # Show an error message if the quantity or alert are not integers
+            messagebox.showerror("Error", "Quantity and alert must be integers")
+
+    else:
+        # Show an error message if any of the fields are empty
+        messagebox.showerror("Error", "All fields are required")
+
+# Define a function to delete a product from the database
+def delete_product():
+    # Get the barcode from the entry field
+    barcode = barcode_entry.get()
+
+    # Check if the barcode is valid
+    if barcode:
+        # Delete the product from the database
+        c.execute("DELETE FROM products WHERE barcode = ?", (barcode,))
+        conn.commit()
+
+        # Clear the entry fields
+        barcode_entry.delete(0, tk.END)
+        name_entry.delete(0, tk.END)
+        quantity_entry.delete(0, tk.END)
+        alert_entry.delete(0, tk.END)
+
+        # Show a success message
+        messagebox.showinfo("Success", "Product deleted successfully")
+
+    else:
+        # Show an error message if the barcode is empty
+        messagebox.showerror("Error", "Barcode is required")
+
+# Define a function to search a product in the database by barcode or name
+def search_product():
+    # Get the search term from the entry field
+    search_term = search_entry.get()
+
+    # Check if the search term is valid
+    if search_term:
+        # Search for the product in the database by barcode or name
+        c.execute("SELECT * FROM products WHERE barcode = ? OR name = ?", (search_term, search_term))
+        result = c.fetchone()
+
+        # Check if the product is found
+        if result:
+            # Display the product details in the entry fields
+            barcode_entry.delete(0, tk.END)
+            barcode_entry.insert(0, result[0])
+            name_entry.delete(0, tk.END)
+            name_entry.insert(0, result[1])
+            quantity_entry.delete(0, tk.END)
+            quantity_entry.insert(0, result[2])
+            alert_entry.delete(0, tk.END)
+            alert_entry.insert(0, result[3])
+
+            # Clear the search field
+            search_entry.delete(0, tk.END)
+
+        else:
+            # Show an error message if the product is not found
+            messagebox.showerror("Error", "Product not found")
+
+    else:
+        # Show an error message if the search term is empty
+        messagebox.showerror("Error", "Search term is required")
+
+# Define a function to scan a barcode using the webcam
+def scan_barcode():
+    # Create a video capture object
+    cap = cv2.VideoCapture(0)
+
+    # Loop until the barcode is scanned or the user presses 'q'
+    while True:
+        # Read a frame from the webcam
+        ret, frame = cap.read()
+
+        # Check if the frame is valid
+        if ret:
+            # Decode the barcode from the frame
+            decoded_objects = pyzbar.decode(frame)
+
+            # Loop through the decoded objects
+            for obj in decoded_objects:
+                # Get the barcode data as a string
+                barcode_data = obj.data.decode('utf-8')
+
+                # Search for the product in the database by barcode
+                c.execute("SELECT * FROM products WHERE barcode = ?", (barcode_data,))
+                result = c.fetchone()
+
+                # Check if the product is found
+                if result:
+                    # Display the product details in the entry fields
+                    barcode_entry.delete(0, tk.END)
+                    barcode_entry.insert(0, result[0])
+                    name_entry.delete(0, tk.END)
+                    name_entry.insert(0, result[1])
+                    quantity_entry.delete(0, tk.END)
+                    quantity_entry.insert(0, result[2])
+                    alert_entry.delete(0, tk.END)
+                    alert_entry.insert(0, result[3])
+
+                    # Show a success message
+                    messagebox.showinfo("Success", "Product scanned successfully")
+
+                else:
+                    # Show an error message if the product is not found
+                    messagebox.showerror("Error", "Product not found")
+
+                # Break the loop
+                break
+
+            # Show the frame on the screen
+            cv2.imshow('Barcode Scanner', frame)
+
+            # Wait for a key press
+            key = cv2.waitKey(1)
+
+            # Check if the user pressed 'q' or scanned a barcode
+            if key == ord('q') or decoded_objects:
+                # Break the loop
+                break
+
+        else:
+            # Break the loop
+            break
+
+    # Release the video capture object and destroy all windows
+    cap.release()
+    cv2.destroyAllWindows()
+
+# Continue the function to check the inventory and show alerts for low stock products or expired products
+def check_inventory():
+    # Query all products from the database
+    c.execute("SELECT * FROM products")
+    results = c.fetchall()
+
+    # Create a list to store the low stock products and expired products
+    low_stock_products = []
+    expired_products = []
+
+    # Get the current date as a datetime object
+    current_date = datetime.datetime.now()
+
+    # Loop through the results
+    for result in results:
+        # Get the product details
+        barcode = result[0]
+        name = result[1]
+        quantity = result[2]
+        alert = result[3]
+        expiry_date = datetime.datetime.strptime(result[4], '%Y-%m-%d')
+
+        # Check if the quantity is less than or equal to the alert level
+        if quantity <= alert:
+            # Add the product to the low stock list
+            low_stock_products.append((barcode, name, quantity))
+
+        # Check if the expiry date is before or equal to the current date
+        if expiry_date <= current_date:
+            # Add the product to the expired list
+            expired_products.append((barcode, name, expiry_date))
+
+    # Check if there are any low stock products or expired products
+    if low_stock_products or expired_products:
+        # Create a new window to display the alerts
+        alert_window = tk.Toplevel(root)
+        alert_window.title("Alerts")
+        alert_window.geometry("500x400")
+
+        # Create a label to show a message
+        alert_label = tk.Label(alert_window, text="The following products need your attention:", font=("Arial", 12))
+        alert_label.pack(pady=10)
+
+        # Create a notebook to show the low stock products and expired products in separate tabs
+        alert_notebook = ttk.Notebook(alert_window)
+        alert_notebook.pack(pady=10)
+
+        # Create a frame for the low stock tab
+        low_stock_frame = tk.Frame(alert_notebook)
+        low_stock_frame.pack(fill='both', expand=1)
+
+        # Create a treeview to show the low stock products
+        low_stock_treeview = ttk.Treeview(low_stock_frame)
+        low_stock_treeview['columns'] = ('Barcode', 'Name', 'Quantity')
+        low_stock_treeview.column('#0', width=0, stretch=tk.NO)
+        low_stock_treeview.column('Barcode', anchor=tk.CENTER, width=100)
+        low_stock_treeview.column('Name', anchor=tk.CENTER, width=300)
+        low_stock_treeview.column('Quantity', anchor=tk.CENTER, width=100)
+        low_stock_treeview.pack(pady=10)
+
+        # Loop through the low stock products and insert them into the treeview
+        for product in low_stock_products:
+            barcode = product[0]
+            name = product[1]
+            quantity = product[2]
+            low_stock_treeview.insert('', 'end', values=(barcode, name, quantity))
+
+        # Add the low stock tab to the notebook
+        alert_notebook.add(low_stock_frame, text="Low Stock")
+
+        # Create a frame for the expired tab
+        expired_frame = tk.Frame(alert_notebook)
+        expired_frame.pack(fill='both', expand=1)
+
+        # Create a treeview to show the expired products
+        expired_treeview = ttk.Treeview(expired_frame)
+        expired_treeview['columns'] = ('Barcode', 'Name', 'Expiry Date')
+        expired_treeview.column('#0', width=0, stretch=tk.NO)
+        expired_treeview.column('Barcode', anchor=tk.CENTER, width=100)
+        expired_treeview.column('Name', anchor=tk.CENTER, width=300)
+        expired_treeview.column('Expiry Date', anchor=tk.CENTER, width=100)
+        expired_treeview.pack(pady=10)
+
+        # Loop through the expired products and insert them into the treeview
+        for product in expired_products:
+            barcode = product[0]
+            name = product[1]
+            expiry_date = product[2].strftime('%Y-%m-%d')
+            expired_treeview.insert('', 'end', values=(barcode, name, expiry_date))
+
+        # Add the expired tab to the notebook
+        alert_notebook.add(expired_frame, text="Expired")
+
+    else:
+        # Show a message that there are no alerts
+        messagebox.showinfo("No alerts", "All products are in good condition")
+# Create the graphical user interface for the program
+
+# Create the root window
+root = tk.Tk()
+root.title("Inventory Management Program")
+root.geometry("800x600")
+
+# Create a frame for the search section
+search_frame = tk.Frame(root)
+search_frame.pack(pady=10)
+
+# Create a label for the search field
+search_label = tk.Label(search_frame, text="Search by barcode or name:", font=("Arial", 12))
+search_label.pack(side=tk.LEFT, padx=10)
+
+# Create an entry field for the search term
+search_entry = tk.Entry(search_frame, font=("Arial", 12))
+search_entry.pack(side=tk.LEFT, padx=10)
+
+# Create a button to search the product
+search_button = tk.Button(search_frame, text="Search", font=("Arial", 12), command=search_product)
+search_button.pack(side=tk.LEFT, padx=10)
+
+# Create a button to scan the barcode
+scan_button = tk.Button(search_frame, text="Scan", font=("Arial", 12), command=scan_barcode)
+scan_button.pack(side=tk.LEFT, padx=10)
+
+# Create a frame for the product details section
+product_frame = tk.Frame(root)
+product_frame.pack(pady=10)
+
+# Create a label for the barcode field
+barcode_label = tk.Label(product_frame, text="Barcode:", font=("Arial", 12))
+barcode_label.grid(row=0, column=0, padx=10, pady=10)
+
+# Create an entry field for the barcode
+barcode_entry = tk.Entry(product_frame, font=("Arial", 12))
+barcode_entry.grid(row=0, column=1, padx=10, pady=10)
+
+# Create a label for the name field
+name_label = tk.Label(product_frame, text="Name:", font=("Arial", 12))
+name_label.grid(row=1, column=0, padx=10, pady=10)
+
+# Create an entry field for the name
+name_entry = tk.Entry(product_frame, font=("Arial", 12))
+name_entry.grid(row=1, column=1, padx=10, pady=10)
+
+# Create a label for the quantity field
+quantity_label = tk.Label(product_frame, text="Quantity:", font=("Arial", 12))
+quantity_label.grid(row=2, column=0, padx=10, pady=10)
+
+# Create an entry field for the quantity
+quantity_entry = tk.Entry(product_frame, font=("Arial", 12))
+quantity_entry.grid(row=2, column=1, padx=10, pady=10)
+
+# Create a label for the alert field
+alert_label = tk.Label(product_frame, text="Alert:", font=("Arial", 12))
+alert_label.grid(row=3, column=0, padx=10, pady=10)
+
+# Create an entry field for the alert
+alert_entry = tk.Entry(product_frame, font=("Arial", 12))
+alert_entry.grid(row=3, column=1, padx=10, pady=10)
+
+# Create a label for the expiry date field
+expiry_date_label = tk.Label(product_frame, text="Expiry Date (YYYY-MM-DD):", font=("Arial", 12))
+expiry_date_label.grid(row=4, column=0, padx=10, pady=10)
+
+# Continue the graphical user interface for the program
+
+# Create an entry field for the expiry date
+expiry_date_entry = tk.Entry(product_frame, font=("Arial", 12))
+expiry_date_entry.grid(row=4, column=1, padx=10, pady=10)
+
+# Create a frame for the buttons section
+button_frame = tk.Frame(root)
+button_frame.pack(pady=10)
+
+# Create a button to add a product
+add_button = tk.Button(button_frame, text="Add", font=("Arial", 12), command=add_product)
+add_button.grid(row=0, column=0, padx=10)
+
+# Create a button to update a product
+update_button = tk.Button(button_frame, text="Update", font=("Arial", 12), command=update_product)
+update_button.grid(row=0, column=1, padx=10)
+
+# Create a button to delete a product
+delete_button = tk.Button(button_frame, text="Delete", font=("Arial", 12), command=delete_product)
+delete_button.grid(row=0, column=2, padx=10)
+
+# Create a button to check the inventory
+check_button = tk.Button(button_frame, text="Check Inventory", font=("Arial", 12), command=check_inventory)
+check_button.grid(row=0, column=3, padx=10)
+
+# Start the main loop of the program
+root.mainloop()
