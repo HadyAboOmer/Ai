@@ -1,410 +1,2245 @@
-
-# Import tkinter library
-import tkinter as tk
-from tkinter import messagebox
-from tkinter import ttk
-
-# Import barcode reader library
-import pyzbar.pyzbar as pyzbar
-import cv2
-
-# Create a database to store the products
+from tkinter import *
+import os,sys
+import time
+import customtkinter
 import sqlite3
-conn = sqlite3.connect('inventory.db')
-c = conn.cursor()
+from playsound import playsound
+from tkinter import ttk
+from tkinter import filedialog
+from PIL import ImageTk, Image
+from tkinter import messagebox
 
-# Create a table for the products
-c.execute("""CREATE TABLE IF NOT EXISTS products (
-    barcode text,
-    name text,
-    quantity integer,
-    alert integer
-    )""")
-conn.commit()
 
-# Define a function to add a product to the database
-def add_product():
-    # Get the values from the entry fields
-    barcode = barcode_entry.get()
-    name = name_entry.get()
-    quantity = quantity_entry.get()
-    alert = alert_entry.get()
+#*******************************************  root setting  **************************************************************
+root = Tk()
+root.title('MetaVerse - Facebook')
+root.geometry('1910x1050')
+root.overrideredirect(False)
+root.config(background="#242628")
+root.resizable(False,False)
+root.iconbitmap('meta ico.ico')
 
-    # Check if the values are valid
-    if barcode and name and quantity and alert:
-        try:
-            # Convert the quantity and alert to integers
-            quantity = int(quantity)
-            alert = int(alert)
 
-            # Insert the values into the database
-            c.execute("INSERT INTO products VALUES (?,?,?,?)", (barcode, name, quantity, alert))
-            conn.commit()
 
-            # Clear the entry fields
-            barcode_entry.delete(0, tk.END)
-            name_entry.delete(0, tk.END)
-            quantity_entry.delete(0, tk.END)
-            alert_entry.delete(0, tk.END)
+#*******************************************  Images Varialbes  **************************************************************
 
-            # Show a success message
-            messagebox.showinfo("Success", "Product added successfully")
+meta = PhotoImage(file='meta.png')
+BEAT_SABER = PhotoImage(file="BEAT-SABER.png",name="Beat Saber")
+BULLET_TRAIN = PhotoImage(file="BULLET-TRAIN.png")
+BOOSTER = PhotoImage(file="BOOSTER.png")
+JOP_SIMULATOR = PhotoImage(file="JOP-SIMULATOR.png")
+ROBORECALL = PhotoImage(file="ROBORECALL.png")
+RICHIES_PLANK = PhotoImage(file="RICHIES-PLANK.png")
+FACE_YOUR_FEARS = PhotoImage(file="FACE-YOUR-FEARS.png")
+COASTER = PhotoImage(file="COASTER.png")
+FRUIT_NINJA = PhotoImage(file="FEUIT-NINJA.png")
+GRAY = PhotoImage(file="GRAY.png")
+INTO_THE_DEAD = PhotoImage(file="INTO-THE-DEAD.png")
+MINECRAFT = PhotoImage(file="MINECRAFT.png")
+OVER_Take_VR = PhotoImage(file="Over-Take-VR.png")
+Spider_MAN = PhotoImage(file="Spider-Man.png")
+ROller_Coasters = PhotoImage(file="Roller-Coasters.png")
+HENRY = PhotoImage(file="Henry.png")
+Batman = PhotoImage(file="Batman.png")
+Arizona_SunshinE = PhotoImage(file="Arizona-Sunshine.png")
+Demonic_Guest_VR = PhotoImage(file="Demonic-Guest-VR.png")
+War_Robots_VR = PhotoImage(file="War-Robots-VR.png")
+THE_Mental_Torment = PhotoImage(file="The-Mental-Torment.png")
+Jurassic_World = PhotoImage(file="Jurassic-World.png")
 
-        except ValueError:
-            # Show an error message if the quantity or alert are not integers
-            messagebox.showerror("Error", "Quantity and alert must be integers")
+def destroy():
+    root.destroy()
+#*******************************************  Control Panel  **************************************************************
 
-    else:
-        # Show an error message if any of the fields are empty
-        messagebox.showerror("Error", "All fields are required")
+def setting():
+    bg_masrt_F = Frame(root, width=1920, height=1300, bg="#242628").place(x=0, y=0)
+    Logo_L = Label(root, width=1920, height=70, bg="#0453a2", image=meta).place(x=0, y=0)
+    home_B = Button(root, borderwidth=0, bg='#0453a2', width=3,height=1, text=" 🔳 ", font=('', 25), fg='white',
+             activebackground='#0453a2', activeforeground="white", command=Tap1).place(x=60, y=2)
+    clos_B = customtkinter.CTkButton(master=root, width=1, height=1, fg_color="#0453a2", bg_color="#0453a2",hover_color="red",
+             text="✖", text_font=('', 14, ""), text_color="white", command=destroy).place(x=1855,y=23)
+    welcom_L = Label (root,text=f"Welcome Back : {username_verify.get()}", bg="#0453a2", font=('', 15),
+             fg='white').place(x=70,y=310)
 
-# Define a function to update a product in the database
-def update_product():
-    # Get the values from the entry fields
-    barcode = barcode_entry.get()
-    name = name_entry.get()
-    quantity = quantity_entry.get()
-    alert = alert_entry.get()
+    Beat_Saber_query()
+    Bullet_Train_query()
+    Booster_query()
+    Jop_Simulator_query()
+    Roborecall_query()
+    Richies_Plank_query()
+    Face_Your_Fears_query()
+    Coaster_query()
+    Spider_Man_query()
+    Over_Take_Vr_query()
+    Into_The_Dead_query()
+    War_Robots_Vr_query()
+    Fruit_Ninja_query()
+    The_Mental_Torment_query()
+    Roller_Coasters_query()
+    Gray_query()
+    Arizona_Sunshine_query()
+    Minecraft_query()
+    Henry_query()
+    Demonic_Guest_Vr_query()
 
-    # Check if the values are valid
-    if barcode and name and quantity and alert:
-        try:
-            # Convert the quantity and alert to integers
-            quantity = int(quantity)
-            alert = int(alert)
+#*******************************************  Games Query  **************************************************************
 
-            # Update the values in the database
-            c.execute("UPDATE products SET name = ?, quantity = ?, alert = ? WHERE barcode = ?", (name, quantity, alert, barcode))
-            conn.commit()
+def Beat_Saber_query():
+    global a
+    global c
+    global c1
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Beat_Saber')
+    result = cursor.fetchall()
+    a = len(result)
+    c1=a
+    b = a * 20
+    c = b
+    print(c1,c)
+    connect.commit()
+    connect.close()
+    # ------------------------------------------------------------------------------
 
-            # Clear the entry fields
-            barcode_entry.delete(0, tk.END)
-            name_entry.delete(0, tk.END)
-            quantity_entry.delete(0, tk.END)
-            alert_entry.delete(0, tk.END)
 
-            # Show a success message
-            messagebox.showinfo("Success", "Product updated successfully")
+    # ------------------------------------------------------------------------------
+             #                                        #                          #
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Beat Saber                                   {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=2, column=1)  #
+    leftuprow = Label(root, width=2, height=2, bg="#0453a2").grid(row=0, column=0, padx=350, pady=37)
 
-        except ValueError:
-            # Show an error message if the quantity or alert are not integers
-            messagebox.showerror("Error", "Quantity and alert must be integers")
+def Bullet_Train_query():
+    global a
+    global d
+    global c2
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Bullet_Train')
+    result = cursor.fetchall()
+    a = len(result)
+    c2=a
+    b = a * 20
+    d = b
+    connect.commit()
+    connect.close()
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Bullet Train                                   {a}                        {b} $  ", bg='#242628', font=('', 15), fg='white').grid(row=3, column=1)
 
-    else:
-        # Show an error message if any of the fields are empty
-        messagebox.showerror("Error", "All fields are required")
+def Booster_query():
+    global a
+    global e
+    global c3
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Booster')
+    result = cursor.fetchall()
+    a = len(result)
+    c3=a
+    b = a * 15
+    e = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
 
-# Define a function to delete a product from the database
-def delete_product():
-    # Get the barcode from the entry field
-    barcode = barcode_entry.get()
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Booster                                        {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=4, column=1)
 
-    # Check if the barcode is valid
-    if barcode:
-        # Delete the product from the database
-        c.execute("DELETE FROM products WHERE barcode = ?", (barcode,))
-        conn.commit()
+def Jop_Simulator_query():
+    global a
+    global f
+    global c4
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Jop_Simulator')
+    result = cursor.fetchall()
+    a = len(result)
+    c4=a
+    b = a * 20
+    f = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Jop Simulator                               {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=5, column=1)
 
-        # Clear the entry fields
-        barcode_entry.delete(0, tk.END)
-        name_entry.delete(0, tk.END)
-        quantity_entry.delete(0, tk.END)
-        alert_entry.delete(0, tk.END)
+def Roborecall_query():
+    global a
+    global g
+    global c5
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Roborecall')
+    result = cursor.fetchall()
+    a = len(result)
+    c5=a
+    b = a * 20
+    g = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
 
-        # Show a success message
-        messagebox.showinfo("Success", "Product deleted successfully")
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Roborecall                                    {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=6, column=1)
 
-    else:
-        # Show an error message if the barcode is empty
-        messagebox.showerror("Error", "Barcode is required")
+def Richies_Plank_query():
+    global a
+    global h
+    global c6
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Richies_Plank')
+    result = cursor.fetchall()
+    a = len(result)
+    c6=a
+    b = a * 15
+    h = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
 
-# Define a function to search a product in the database by barcode or name
-def search_product():
-    # Get the search term from the entry field
-    search_term = search_entry.get()
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Richies Plank                                {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=7, column=1)
 
-    # Check if the search term is valid
-    if search_term:
-        # Search for the product in the database by barcode or name
-        c.execute("SELECT * FROM products WHERE barcode = ? OR name = ?", (search_term, search_term))
-        result = c.fetchone()
+def Face_Your_Fears_query():
+    global a
+    global i
+    global c7
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Face_Your_Fears')
+    result = cursor.fetchall()
+    a = len(result)
+    c7=a
+    b = a * 15
+    i = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
 
-        # Check if the product is found
-        if result:
-            # Display the product details in the entry fields
-            barcode_entry.delete(0, tk.END)
-            barcode_entry.insert(0, result[0])
-            name_entry.delete(0, tk.END)
-            name_entry.insert(0, result[1])
-            quantity_entry.delete(0, tk.END)
-            quantity_entry.insert(0, result[2])
-            alert_entry.delete(0, tk.END)
-            alert_entry.insert(0, result[3])
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Face Your Fears                          {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=8, column=1)
 
-            # Clear the search field
-            search_entry.delete(0, tk.END)
+def Coaster_query():
+    global a
+    global j
+    global c8
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Coaster')
+    result = cursor.fetchall()
+    a = len(result)
+    c8=a
+    b = a * 15
+    j = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
 
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Coaster                                       {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=9, column=1)
+
+def Spider_Man_query():
+    global a
+    global k
+    global c9
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Spider_Man')
+    result = cursor.fetchall()
+    a = len(result)
+    c9 = a
+    b = a * 20
+    k = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Spider Man                                  {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=10 , column=1)
+
+def Over_Take_Vr_query():
+    global a
+    global l
+    global c10
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Over_Take_Vr')
+    result = cursor.fetchall()
+    a = len(result)
+    c10=a
+    b = a * 20
+    l = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Over Take Vr                               {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=11 , column=1)
+
+def Into_The_Dead_query():
+    global a
+    global m
+    global c11
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Into_The_Dead')
+    result = cursor.fetchall()
+    a = len(result)
+    c11=a
+    b = a * 20
+    m = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    titte_L = customtkinter.CTkLabel(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', text_font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Into The Dead                              {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=12 , column=1)
+
+def War_Robots_Vr_query():
+    global a
+    global n
+    global c12
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from War_Robots_Vr')
+    result = cursor.fetchall()
+    a = len(result)
+    c12=a
+    b = a * 20
+    n = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" War Robots Vr                             {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=13 , column=1)
+
+def Fruit_Ninja_query():
+    global a
+    global o
+    global c13
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Fruit_Ninja')
+    result = cursor.fetchall()
+    a = len(result)
+    c13=a
+    b = a * 20
+    o = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Fruit Ninja                                    {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=14 , column=1)
+
+def The_Mental_Torment_query():
+    global a
+    global p
+    global c14
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from The_Mental_Torment')
+    result = cursor.fetchall()
+    a = len(result)
+    c14=a
+    b = a * 20
+    p = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" The Mental Torment                     {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=15 , column=1)
+
+def Roller_Coasters_query():
+    global a
+    global q
+    global c15
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Roller_Coasters')
+    result = cursor.fetchall()
+    a = len(result)
+    c15=a
+    b = a * 15
+    q = b
+    connect.commit()
+    connect.close()
+
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Roller Coasters                            {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=16 , column=1)
+
+def Gray_query():
+    global a
+    global r
+    global c16
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Gray')
+    result = cursor.fetchall()
+    a = len(result)
+    c16=a
+    b = a * 20
+    r = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Gray                                           {a}                         {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=17 , column=1)
+
+def Arizona_Sunshine_query():
+    global a
+    global s
+    global c17
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Arizona_Sunshine')
+    result = cursor.fetchall()
+    a = len(result)
+    c17=a
+    b = a * 20
+    s = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Arizona Sunshine                          {a}                         {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=18 , column=1)
+
+def Minecraft_query():
+    global a
+    global t
+    global c18
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Minecraft')
+    result = cursor.fetchall()
+    a = len(result)
+    c18=a
+    b = a * 20
+    t = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Minecraft                                     {a}                         {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=19 , column=1)
+
+def Henry_query():
+    global a
+    global u
+    global c19
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Henry')
+    result = cursor.fetchall()
+    a = len(result)
+    c19 = a
+    b = a * 15
+    u = b
+    connect.commit()
+    connect.close()
+                                         #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Henry                                          {a}                         {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=20 , column=1)
+
+def Demonic_Guest_Vr_query():
+    global a
+    global v
+    global c20
+    global nm
+    global all_money
+    global largnum
+    global allmoney
+    global Top_play
+    connect = sqlite3.connect("2000db.db")
+    cursor = connect.cursor()
+    cursor.execute('select * from Demonic_Guest_Vr')
+    result = cursor.fetchall()
+    a = len(result)
+    # name = result[0]
+    # Name = name[1]
+    # print(Name)
+    c20 = a
+    b = a * 15
+    v = b
+
+    all_money =(c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v)      # all tables variable in one variable #allmoney in SQL c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v
+    all_clicks =(c1+c2+c3+c4+c5+c6+c7+c8+c9+c10+c11+c12+c13+c14+c15+c16+c17+c18+c19+c20)
+
+    connect.commit()
+    connect.close()
+
+    Top_play = (c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20)  # all tables variable in one variable #allmoney in SQL
+    largnum = max(Top_play)
+    print(f"Top Game Clicks {largnum} is name is  :  ")
+
+    # for number in largnum:  # For get heights Number from all tables in SQL
+    #     if number > largnum:
+    #         largnum = number
+    #     print(largnum)
+    # connect.commit()
+
+    #                                      #                                        #                          #
+
+    sumclick_L = Label(root, text=f"   Game Name                             Clicks                  Money ",
+                       bg='#0453a2', font=('', 15), fg='white').grid(row=1, column=1, padx=50, pady=30)
+    sumclick_L = Label(root, text=f" Demonic_Guest_Vr                                 {a}                        {b} $  "
+                       , bg='#242628', font=('', 15), fg='white').grid(row=21 , column=1)
+    total_moneyL = Label(root,text=f" Total Money : {all_money}  $  "
+                       , bg='#0453a2', font=('', 45), fg='white').place(x=70,y=350)
+    total_clicksL = Label(root,text=f" Total Clicks : {all_clicks}  Clicks  "                             # all_clicks
+                       , bg='#0453a2', font=('', 30), fg='white').place(x=70,y=425)
+
+    # top_game = Label(root,text=f" Total Clicks : {largnum}  Clicks  "                                     # top_game
+    #                    , bg='#0453a2', font=('', 30), fg='white').place(x=70,y=375)
+
+#*******************************************  Login Setting   **************************************************************
+
+def login():
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                                  fg_color="#131313", bg_color="#161616").place(x=0, y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=575, height=400, border_width=0, corner_radius=15,
+                                   fg_color="#1A1A1A", bg_color="#131313").place(x=689, y=210)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=550, height=375, border_width=0, corner_radius=15,
+                                   fg_color="#1e1e1e", bg_color="#1A1A1A").place(x=700, y=225)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=525, height=225, border_width=0, corner_radius=15,
+                                   fg_color="#222222", bg_color="#1e1e1e").place(x=713, y=242)
+    global username_verify
+    global password_verify
+    global result
+    global username_login_entry
+    global password_login_entry
+    username_verify = StringVar()
+    password_verify = StringVar()
+    username_login_entry = customtkinter.CTkEntry(None, width=400, height=45, fg_color="#222222", border_width=2, border_color="#0e67fb",
+           text_font=('', 13, ""),text_color="white",placeholder_text=" Username ",placeholder_text_color="#707070",
+           textvariable=username_verify).place(x=775, y=285)
+    password_login_entry = customtkinter.CTkEntry(None, width=400, height=45, fg_color="#222222", border_width=2,border_color="#0e67fb",
+           text_font=('', 13, ""),text_color="white",placeholder_text=" Password", placeholder_text_color="#707070",
+           textvariable=password_verify, show='●').place(x=775, y=375)
+    login_B = customtkinter.CTkButton(master=root, width=350, height=50, border_width=0, border_color="",corner_radius=15,
+           fg_color="#0453a2", bg_color="#1e1e1e", hover_color="#01407f", text="LogIn",text_font=('', 14, ""),text_color="white",
+           compound="top",command=login_verify).place(x=800, y=500)
+    home_B = Button(root, borderwidth=0, bg='#0453a2', width=3,height=1, text=" 🔳 ", font=('', 25), fg='white',
+           activebackground='#0453a2', activeforeground="white", command=Tap1).place(x=60, y=2)
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=575, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=689,y=120)
+    login_L=Label(root,text="Login", bg='#012951',font=('', 25), fg='white').place(x=720, y=140)
+
+def login_verify():
+    username1 = username_verify.get()
+    password1 = password_verify.get()
+    list_of_files = os.listdir()
+    if username1 in list_of_files:
+        file1 = open(username1, "r")
+        verify = file1.read().splitlines()
+        if password1 in verify:
+            setting()
         else:
-            # Show an error message if the product is not found
-            messagebox.showerror("Error", "Product not found")
+            login()
 
-    else:
-        # Show an error message if the search term is empty
-        messagebox.showerror("Error", "Search term is required")
 
-# Define a function to scan a barcode using the webcam
-def scan_barcode():
-    # Create a video capture object
-    cap = cv2.VideoCapture(0)
+def stop():
+    os.system("taskkill /im  Meta VR.exe")
 
-    # Loop until the barcode is scanned or the user presses 'q'
-    while True:
-        # Read a frame from the webcam
-        ret, frame = cap.read()
+def ref():
+    return setting()
 
-        # Check if the frame is valid
-        if ret:
-            # Decode the barcode from the frame
-            decoded_objects = pyzbar.decode(frame)
+def stop():
+    os.system("taskkill /im  MetaVR.exe")
 
-            # Loop through the decoded objects
-            for obj in decoded_objects:
-                # Get the barcode data as a string
-                barcode_data = obj.data.decode('utf-8')
 
-                # Search for the product in the database by barcode
-                c.execute("SELECT * FROM products WHERE barcode = ?", (barcode_data,))
-                result = c.fetchone()
+#*******************************************  Game Setting   **************************************************************
 
-                # Check if the product is found
-                if result:
-                    # Display the product details in the entry fields
-                    barcode_entry.delete(0, tk.END)
-                    barcode_entry.insert(0, result[0])
-                    name_entry.delete(0, tk.END)
-                    name_entry.insert(0, result[1])
-                    quantity_entry.delete(0, tk.END)
-                    quantity_entry.insert(0, result[2])
-                    alert_entry.delete(0, tk.END)
-                    alert_entry.insert(0, result[3])
-
-                    # Show a success message
-                    messagebox.showinfo("Success", "Product scanned successfully")
-
-                else:
-                    # Show an error message if the product is not found
-                    messagebox.showerror("Error", "Product not found")
-
-                # Break the loop
-                break
-
-            # Show the frame on the screen
-            cv2.imshow('Barcode Scanner', frame)
-
-            # Wait for a key press
-            key = cv2.waitKey(1)
-
-            # Check if the user pressed 'q' or scanned a barcode
-            if key == ord('q') or decoded_objects:
-                # Break the loop
-                break
-
+def Beat_Saber():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    gname = "Beat Saber.exe"
+    def submit():
+        os.startfile(r"d:\Software\Software\hyperbolic-magnetism-beat-saber\Beat Saber.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        print(f'{temp /60} minute')
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Beat_Saber (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Beat_Saber (Game_ClickCount) values (1)")
+                c.execute('select * from Beat_Saber')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
         else:
-            # Break the loop
-            break
+            os.system(f"taskkill /im  {gname}")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="BEAT-SABER.png")
+    gameName = str("Beat Saber")
 
-    # Release the video capture object and destroy all windows
-    cap.release()
-    cv2.destroyAllWindows()
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-# Continue the function to check the inventory and show alerts for low stock products or expired products
-def check_inventory():
-    # Query all products from the database
-    c.execute("SELECT * FROM products")
-    results = c.fetchall()
+def Bullet_Train():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\epic-games-bullet-train-gdc\BulletTrain-GDC-1.8SDK\showup.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("INSERT INTO  Bullet_Train (Game_ClickCount) values (1) ")
+                c.execute('select * from Bullet_Train')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", f"Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im UE4Game-Win64-Test.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="BULLET-TRAIN.png")
+    gameName = str("Bullet Train")
 
-    # Create a list to store the low stock products and expired products
-    low_stock_products = []
-    expired_products = []
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-    # Get the current date as a datetime object
-    current_date = datetime.datetime.now()
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-    # Loop through the results
-    for result in results:
-        # Get the product details
-        barcode = result[0]
-        name = result[1]
-        quantity = result[2]
-        alert = result[3]
-        expiry_date = datetime.datetime.strptime(result[4], '%Y-%m-%d')
+def Booster():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("03")
+    second.set("00")
+    def submit():
+        os.startfile(r"D:\Software\Software\gexagonvr-ultimate-booster\UltimateBooster\UltimateBooster.exe")                                                  #******  Game Path  *******
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Booster (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Booster (Game_ClickCount) values (1) ")
+                c.execute('select * from Booster')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im UltimateBooster.exe")                             #******  Game Path  *******
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="BOOSTER.png")
+    gameName = str("Booster")
 
-        # Check if the quantity is less than or equal to the alert level
-        if quantity <= alert:
-            # Add the product to the low stock list
-            low_stock_products.append((barcode, name, quantity))
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-        # Check if the expiry date is before or equal to the current date
-        if expiry_date <= current_date:
-            # Add the product to the expired list
-            expired_products.append((barcode, name, expiry_date))
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-    # Check if there are any low stock products or expired products
-    if low_stock_products or expired_products:
-        # Create a new window to display the alerts
-        alert_window = tk.Toplevel(root)
-        alert_window.title("Alerts")
-        alert_window.geometry("500x400")
+def Jop_Simulator():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\owlchemy-labs-job-simulator\Job Simulator.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Jop_Simulator (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Jop_Simulator (Game_ClickCount) values (1) ")
+                c.execute('select * from Jop_Simulator')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im Job Simulator.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="JOP-SIMULATOR.png")
+    gameName = str("Jop Simulator")
 
-        # Create a label to show a message
-        alert_label = tk.Label(alert_window, text="The following products need your attention:", font=("Arial", 12))
-        alert_label.pack(pady=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-        # Create a notebook to show the low stock products and expired products in separate tabs
-        alert_notebook = ttk.Notebook(alert_window)
-        alert_notebook.pack(pady=10)
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-        # Create a frame for the low stock tab
-        low_stock_frame = tk.Frame(alert_notebook)
-        low_stock_frame.pack(fill='both', expand=1)
+def Roborecall():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\epic-games-odin\RoboRecall\Binaries\Win64\RoboRecall-Win64-Shipping.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Roborecall (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Roborecall (Game_ClickCount) values (1) ")
+                c.execute('select * from Roborecall')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im RoboRecall-Win64-Shipping.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="ROBORECALL.png")
+    gameName = str("Roborecall")
 
-        # Create a treeview to show the low stock products
-        low_stock_treeview = ttk.Treeview(low_stock_frame)
-        low_stock_treeview['columns'] = ('Barcode', 'Name', 'Quantity')
-        low_stock_treeview.column('#0', width=0, stretch=tk.NO)
-        low_stock_treeview.column('Barcode', anchor=tk.CENTER, width=100)
-        low_stock_treeview.column('Name', anchor=tk.CENTER, width=300)
-        low_stock_treeview.column('Quantity', anchor=tk.CENTER, width=100)
-        low_stock_treeview.pack(pady=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
 
-        # Loop through the low stock products and insert them into the treeview
-        for product in low_stock_products:
-            barcode = product[0]
-            name = product[1]
-            quantity = product[2]
-            low_stock_treeview.insert('', 'end', values=(barcode, name, quantity))
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
 
-        # Add the low stock tab to the notebook
-        alert_notebook.add(low_stock_frame, text="Low Stock")
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
 
-        # Create a frame for the expired tab
-        expired_frame = tk.Frame(alert_notebook)
-        expired_frame.pack(fill='both', expand=1)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
 
-        # Create a treeview to show the expired products
-        expired_treeview = ttk.Treeview(expired_frame)
-        expired_treeview['columns'] = ('Barcode', 'Name', 'Expiry Date')
-        expired_treeview.column('#0', width=0, stretch=tk.NO)
-        expired_treeview.column('Barcode', anchor=tk.CENTER, width=100)
-        expired_treeview.column('Name', anchor=tk.CENTER, width=300)
-        expired_treeview.column('Expiry Date', anchor=tk.CENTER, width=100)
-        expired_treeview.pack(pady=10)
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
 
-        # Loop through the expired products and insert them into the treeview
-        for product in expired_products:
-            barcode = product[0]
-            name = product[1]
-            expiry_date = product[2].strftime('%Y-%m-%d')
-            expired_treeview.insert('', 'end', values=(barcode, name, expiry_date))
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
 
-        # Add the expired tab to the notebook
-        alert_notebook.add(expired_frame, text="Expired")
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-    else:
-        # Show a message that there are no alerts
-        messagebox.showinfo("No alerts", "All products are in good condition")
-# Create the graphical user interface for the program
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
 
-# Create the root window
-root = tk.Tk()
-root.title("Inventory Management Program")
-root.geometry("800x600")
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
 
-# Create a frame for the search section
-search_frame = tk.Frame(root)
-search_frame.pack(pady=10)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
 
-# Create a label for the search field
-search_label = tk.Label(search_frame, text="Search by barcode or name:", font=("Arial", 12))
-search_label.pack(side=tk.LEFT, padx=10)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),
+            fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+            text_color="white").place(x=870,y=270)
 
-# Create an entry field for the search term
-search_entry = tk.Entry(search_frame, font=("Arial", 12))
-search_entry.pack(side=tk.LEFT, padx=10)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),
+            fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+            text_color="white").place(x=940,y=270)
 
-# Create a button to search the product
-search_button = tk.Button(search_frame, text="Search", font=("Arial", 12), command=search_product)
-search_button.pack(side=tk.LEFT, padx=10)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),
+                     fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                     text_color="white").place(x=1010,y=270)
 
-# Create a button to scan the barcode
-scan_button = tk.Button(search_frame, text="Scan", font=("Arial", 12), command=scan_barcode)
-scan_button.pack(side=tk.LEFT, padx=10)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+def Richies_Plank():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("03")
+    second.set("00")
+    def submit():
+        os.startfile(r"D:\Software\Software\toast-richie-s-plank-experience\RichiesPlankExperience 2.69o\RichiesPlankExperience.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Richies_Plank (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Richies_Plank (Game_ClickCount) values (1) ")
+                c.execute('select * from Richies_Plank')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im RichiesPlankExperience.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="RICHIES-PLANK.png")
+    gameName = str("Richies Plank")
 
-# Create a frame for the product details section
-product_frame = tk.Frame(root)
-product_frame.pack(pady=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-# Create a label for the barcode field
-barcode_label = tk.Label(product_frame, text="Barcode:", font=("Arial", 12))
-barcode_label.grid(row=0, column=0, padx=10, pady=10)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-# Create an entry field for the barcode
-barcode_entry = tk.Entry(product_frame, font=("Arial", 12))
-barcode_entry.grid(row=0, column=1, padx=10, pady=10)
+def Face_Your_Fears():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\turtle-rock-studios-face-your-fears-rift\Fears.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Face_Your_Fears (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Face_Your_Fears (Game_ClickCount) values (1) ")
+                c.execute('select * from Face_Your_Fears')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im Fears-Win64-Shipping.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="FACE-YOUR-FEARS.png")
+    gameName = str("Face Your Fears")
 
-# Create a label for the name field
-name_label = tk.Label(product_frame, text="Name:", font=("Arial", 12))
-name_label.grid(row=1, column=0, padx=10, pady=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-# Create an entry field for the name
-name_entry = tk.Entry(product_frame, font=("Arial", 12))
-name_entry.grid(row=1, column=1, padx=10, pady=10)
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-# Create a label for the quantity field
-quantity_label = tk.Label(product_frame, text="Quantity:", font=("Arial", 12))
-quantity_label.grid(row=2, column=0, padx=10, pady=10)
+def Coaster():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("03")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\monster-paw-coaster-rift\Coaster.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Coaster (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Coaster (Game_ClickCount) values (1) ")
+                c.execute('select * from Coaster')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im Coaster.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="COASTER.png")
+    gameName = str("Coaster")
 
-# Create an entry field for the quantity
-quantity_entry = tk.Entry(product_frame, font=("Arial", 12))
-quantity_entry.grid(row=2, column=1, padx=10, pady=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-# Create a label for the alert field
-alert_label = tk.Label(product_frame, text="Alert:", font=("Arial", 12))
-alert_label.grid(row=3, column=0, padx=10, pady=10)
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-# Create an entry field for the alert
-alert_entry = tk.Entry(product_frame, font=("Arial", 12))
-alert_entry.grid(row=3, column=1, padx=10, pady=10)
+def Spider_Man():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\sony-pictures-virtual-reality-spider-man-homecoming-virtual-reality-experience\SMHCVR.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Spider_Man (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Spider_Man (Game_ClickCount) values (1) ")
+                c.execute('select * from Spider_Man')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im SMHCVR-Win64-Shipping.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="Spider-Man.png")
+    gameName = str("Spider Man")
 
-# Create a label for the expiry date field
-expiry_date_label = tk.Label(product_frame, text="Expiry Date (YYYY-MM-DD):", font=("Arial", 12))
-expiry_date_label.grid(row=4, column=0, padx=10, pady=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-# Continue the graphical user interface for the program
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-# Create an entry field for the expiry date
-expiry_date_entry = tk.Entry(product_frame, font=("Arial", 12))
-expiry_date_entry.grid(row=4, column=1, padx=10, pady=10)
+def Over_Take_Vr():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\won1games-overtake\OvertakeVR.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Over_Take_Vr (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Over_Take_Vr (Game_ClickCount) values (1) ")
+                c.execute('select * from Over_Take_Vr')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im OvertakeVR.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="Over-Take-VR.png")
+    gameName = str("Over Take Vr")
 
-# Create a frame for the buttons section
-button_frame = tk.Frame(root)
-button_frame.pack(pady=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-# Create a button to add a product
-add_button = tk.Button(button_frame, text="Add", font=("Arial", 12), command=add_product)
-add_button.grid(row=0, column=0, padx=10)
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-# Create a button to update a product
-update_button = tk.Button(button_frame, text="Update", font=("Arial", 12), command=update_product)
-update_button.grid(row=0, column=1, padx=10)
+def Into_The_Dead():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\pikpok-into-the-dead-rift\DR.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Into_The_Dead (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Into_The_Dead (Game_ClickCount) values (1) ")
+                c.execute('select * from Into_The_Dead')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im DR.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="INTO-THE-DEAD.png")
+    gameName = str("Into The Dead")
 
-# Create a button to delete a product
-delete_button = tk.Button(button_frame, text="Delete", font=("Arial", 12), command=delete_product)
-delete_button.grid(row=0, column=2, padx=10)
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
 
-# Create a button to check the inventory
-check_button = tk.Button(button_frame, text="Check Inventory", font=("Arial", 12), command=check_inventory)
-check_button.grid(row=0, column=3, padx=10)
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
 
-# Start the main loop of the program
+def War_Robots_Vr():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\pixonic-games-ltd-war-robots-vr\WR-VR_Oculus\WR-VR.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists War_Robots_Vr (Game_ClickCount integer)")
+                c.execute("INSERT INTO  War_Robots_Vr (Game_ClickCount) values (1) ")
+                c.execute('select * from War_Robots_Vr')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im WR-VR.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="War-Robots-VR.png")
+    gameName = str("War_Robots_Vr")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+def Fruit_Ninja():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"D:\Software\Software\halfbrick-studios-pty-ltd-fruit-ninja\FruitNinja.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Fruit_Ninja (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Fruit_Ninja (Game_ClickCount) values (1) ")
+                c.execute('select * from Fruit_Ninja')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im FruitNinja.exe")
+            # time.sleep(1)
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="FEUIT-NINJA.png")
+    gameName = str("Fruit Ninja")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def The_Mental_Torment():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\the-andronauts-mental-torment-episode-one\Mental Torment Episode One.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists The_Mental_Torment (Game_ClickCount integer)")
+                c.execute("INSERT INTO  The_Mental_Torment (Game_ClickCount) values (1) ")
+                c.execute('select * from The_Mental_Torment')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im Mental Torment Episode One.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="The-Mental-Torment.png")
+    gameName = str("The Mental Torment")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def Roller_Coasters():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("03")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\b4t-games-epic-roller-coaster\EpicRollerCoasters.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Roller_Coasters (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Roller_Coasters (Game_ClickCount) values (1) ")
+                c.execute('select * from Roller_Coasters')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im EpicRollerCoasters.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="Roller-Coasters.png")
+    gameName = str("Roller Coasters")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                                   border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def Gray():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\lightngames-gray\Gray\Project_VRHorror.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Gray (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Gray (Game_ClickCount) values (1) ")
+                c.execute('select * from Gray')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im Project_VRHorror.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage = PhotoImage(file="GRAY.png")
+    gameName = str("Gray")
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def Arizona_Sunshine():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\vertigo-games-arizona-sunshine\ArizonaSunshine.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Arizona_Sunshine (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Arizona_Sunshine (Game_ClickCount) values (1) ")
+                c.execute('select * from Arizona_Sunshine')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im ArizonaSunshine.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage =  PhotoImage(file="Arizona-Sunshine.png")
+    gameName = str("Arizona Sunshine")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"), text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def Minecraft():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("00")
+    second.set("00")
+    def submit():
+        os.startfile("D:\\AnyDesk.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Minecraft (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Minecraft (Game_ClickCount) values (1) ")
+                c.execute('select * from Minecraft')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im AnyDesk.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage =  PhotoImage(file="MINECRAFT.png")
+    gameName = str("Minecraft")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"),text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),fg_color="#101010",border_width=2,
+                 border_color="#0e67fb",text_font=('Verdana',25,"bold"), text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def Henry():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\oculus-henry\Henry\Binaries\Win64\Henry-Win64-Shipping.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Henry (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Henry (Game_ClickCount) values (1) ")
+                c.execute('select * from Henry')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im Henry-Win64-Shipping.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage =  PhotoImage(file="Henry.png")
+    gameName = str("Henry")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def Demonic_Guest_Vr():
+    global gameImage
+    global gameName
+    global gamePath
+    hour = StringVar()
+    minute = StringVar()
+    second = StringVar()
+    hour.set("00")
+    minute.set("07")
+    second.set("00")
+    def submit():
+        os.startfile(r"d:\Software\Software\multipc-demonicguestvr\DemonicGuestVR.exe")
+        temp = int(hour.get()) * 3600 + int(minute.get()) * 60 + int(second.get())
+        while temp > -1:
+            mins, secs = divmod(temp, 60)
+            hours = 0
+            if mins > 60:
+                hours, mins = divmod(mins, 60)
+            hour.set("{0:2d}".format(hours))
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+            root.update()
+            time.sleep(1)
+            if (temp == 120):
+                connect = sqlite3.connect("2000db.db")
+                c = connect.cursor()
+                c.execute("CREATE TABLE if not exists Demonic_Guest_Vr (Game_ClickCount integer)")
+                c.execute("INSERT INTO  Demonic_Guest_Vr (Game_ClickCount) values (1) ")
+                c.execute('select * from Demonic_Guest_Vr')
+                result = c.fetchall()
+                print(len(result))
+                connect.commit()
+                connect.close()
+            if (temp == 0):
+                messagebox.showinfo("Time Countdown", "Time's up ")
+            temp -= 1
+        else:
+            os.system("taskkill /im DemonicGuestVR-Win64-Shipping.exe")
+            # time.sleep(1)
+            return Tap1()
+    gameImage =  PhotoImage(file="Demonic-Guest-VR.png")
+    gameName = str("Demonic Guest VR")
+
+    BG_F = customtkinter.CTkFrame(master=root, width=1920, height=1300, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#161616").place(x=0,y=75)
+    BG_F1 = customtkinter.CTkFrame(master=root, width=570, height=590, border_width=0, corner_radius=15,
+                 fg_color="#151515", bg_color="#101010").place(x=690,y=107)    #الكبير
+    BG_F1 = customtkinter.CTkFrame(master=root, width=550, height=470, border_width=0, corner_radius=15,
+                 fg_color="#191919", bg_color="#151515").place(x=700,y=210)    #الصوره
+    BG_F1 = customtkinter.CTkFrame(master=root, width=390, height=245, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=778,y=328)    # 1 الصوره
+    BG_gamenameHF = customtkinter.CTkFrame(master=root, width=550, height=80, border_width=0, corner_radius=15,
+                 fg_color="#012951", bg_color="#151515").place(x=700,y=120)    #هيدر اسم اللعبه
+    BG_gamenameHFL = customtkinter.CTkLabel(master=root, width=1, text=gameName,text_color="white",text_font=('', 20,""),
+                 fg_color="#012951", bg_color="#012951").place(x=730,y=142)    #خلفية اسم اللعبه
+    play_B = customtkinter.CTkButton(master=root,width=270,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="#0453a2", bg_color="#1b1b1b", hover_color="#012951",text="Play Now",text_font=('',14,""),
+                 text_color="white",command=submit).place(x=750,y=600)
+
+    stop_B = customtkinter.CTkButton(master=root,width=150,height=60,border_width=0,border_color="",corner_radius=15,
+                 fg_color="red", bg_color="#1b1b1b", hover_color="#012951",text="Stop Game",text_font=('',14,""),
+                 text_color="white",command=stop).place(x=1050,y=600)
+    BG_F2 = customtkinter.CTkFrame(master=root, width=500, height=100, border_width=0, corner_radius=15,
+                 fg_color="#141414", bg_color="#191919").place(x=725,y=250)      # هيدر التايمر
+    BG_F2 = customtkinter.CTkFrame(master=root, width=475, height=75, border_width=0, corner_radius=15,
+                 fg_color="#101010", bg_color="#141414").place(x=737,y=262)      # خلفية التايمر
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(hour),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=870,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(minute),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=940,y=270)
+    entry = customtkinter.CTkEntry(None,width=60,height=60,textvariable=(second),
+                 fg_color="#101010",border_width=2,border_color="#0e67fb",text_font=('Verdana',25,"bold"),
+                 text_color="white").place(x=1010,y=270)
+    gameImageL = Label(root, bg="#0453a2",borderwidth= 0, image=gameImage).place(x=790, y=352)
+
+def Tap1():
+    bg_masrt_F = Frame(root, width=1920, height=1300, bg="#242628")
+    bg_masrt_F.place(x=0, y=0)
+    Logo_L = Label(root, width=1920, height=70, bg="#0453a2", image=meta).place(x=0, y=0)
+
+    # next_B = Button(root, borderwidth=0, bg='#0453a2', width=1, text=" ▶ ", font=('', 25), fg='white',
+    #             activebackground='#0453a2', activeforeground="white", command=Tap2).place(x=60, y=6)
+
+    login_B = customtkinter.CTkButton(master=root, fg_color="#0453a2", bg_color="#0453a2", hover_color="#03478c",
+                       text="Login", text_font=('', 14, ""), text_color="white", command=login).place(x=1700,y=23)
+    clos_B = customtkinter.CTkButton(master=root, width=1, height=1, fg_color="#0453a2", bg_color="#0453a2",hover_color="red",
+                       text="✖", text_font=('', 14, ""), text_color="white", command=destroy).place(x=1855,y=23)
+    home_B = Button(root, borderwidth=0, bg='#0453a2', width=3,height=1, text=" 🔳 ", font=('', 25), fg='white',
+                       activebackground='#0453a2', activeforeground="white", command=Tap1).place(x=60, y=2)
+
+##########################################---GAMES---################################# GAME NAME ########################################
+
+    BEAT_SABER_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Beat Saber",
+    font=('Simplified Arabic',14),activeforeground="white",fg='white',activebackground='#242628',image=BEAT_SABER,command=Beat_Saber).place(x=15,y=75)
+    BULLET_TRAIN_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Bullet Train",
+    font=('Simplified Arabic',14),fg='white' ,activebackground='#242628',image=BULLET_TRAIN,command=Bullet_Train).place(x=395,y=75)
+    BOOSTER_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Ultimate Booster",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=BOOSTER,command=Booster).place(x=775,y=75)
+    JOP_SIMULATOR_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Job Simulator",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=JOP_SIMULATOR,command=Jop_Simulator).place(x=1155,y=75)
+    ROBORECALL_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Robo Recall",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=ROBORECALL,command=Roborecall).place(x=1535,y=75)
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+    RICHIES_PLANK_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Richie's Plank Experience",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=RICHIES_PLANK,command=Richies_Plank).place(x=15,y=325)
+    FACE_YOUR_FEARS_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Face Your Fears",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=FACE_YOUR_FEARS,command=Face_Your_Fears).place(x=395,y=325)
+    Spider_Man_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Spider Man",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=Spider_MAN,command=Spider_Man).place(x=775,y=325)
+    Over_Take_VR_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Over Take VR",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',command=Over_Take_Vr,image=OVER_Take_VR).place(x=1155,y=325)
+    COASTER_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Coaster",font=('Simplified Arabic',
+    14),fg='white',activebackground='#242628',image=COASTER,command=Coaster).place(x=1535,y=325)
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
+
+    INTO_THE_DEAD_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Into The Dead",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=INTO_THE_DEAD,command=Into_The_Dead).place(x=15,y=575)
+    War_Robots_VR_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="War Robots VR",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=War_Robots_VR,command=War_Robots_Vr).place(x=395,y=575)
+    FRUIT_NINJA_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Fruit Ninja",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=FRUIT_NINJA,command=Fruit_Ninja).place(x=775,y=575)
+    The_Mental_Torment_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="The Mental Torment",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=THE_Mental_Torment,command=The_Mental_Torment).place(x=1155,y=575)
+    Roller_Coasters_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Roller Coasters",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=ROller_Coasters,command=Roller_Coasters).place(x=1535,y=575)
+#----------------------------------------------------------------------------------------------------------------------------------------
+
+    GRAY_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Gray",font=('Simplified Arabic',14),
+    fg='white',activebackground='#242628',image=GRAY).place(x=15,y=825)
+    Arizona_Sunshine_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Arizona Sunshine",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=Arizona_SunshinE,command=Arizona_Sunshine).place(x=395,y=825)
+    MINECRAFT_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Mine Craft",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=MINECRAFT,command=Minecraft).place(x=775,y=825)
+    Henry_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Henry",font=('Simplified Arabic',14),
+    fg='white',activebackground='#242628',image=HENRY,command=Henry).place(x=1155,y=825)
+
+    Demonic_Guest_VR_B = Button(root,borderwidth=0,bg='#242628',compound="top",text="Demonic Guest VR",
+    font=('Simplified Arabic',14),fg='white',activebackground='#242628',image=Demonic_Guest_VR,command=Demonic_Guest_Vr).place(x=1535,y=825)
+
+def Tap2():
+    bg_masrt_F = Frame(root, width=1920, height=1300, bg="#242628")
+    bg_masrt_F.place(x=0, y=0)
+    Logo_L = Label(root, width=1920, height=70, bg="#0453a2", image=meta).place(x=0, y=0)
+    bg_masrt_F = Frame(root, width=1920, height=1300, bg="#242628")
+    bg_masrt_F.place(x=0, y=0)
+    Logo_L = Label(root, width=1920, height=70, bg="#0453a2", image=meta).place(x=0, y=0)
+
+    back_B = Button(root, borderwidth=0, bg='#0453a2', width=1, text=" ◀ ", font=('', 25), fg='white',
+    activebackground='#0453a2',command=Tap1)
+    back_B.place(x=15, y=6)
+
+    home_B = Button(root, borderwidth=0, bg='#0453a2', width=3,height=3, text=" 🔳 ", font=('', 25), fg='white',
+                    activebackground='#0453a2', activeforeground="white", command=Tap1).place(x=60, y=2)
+
+
+
+
+    Jurassic_World_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Beat Saber",
+    font=('Simplified Arabic', 14), activeforeground="white", fg='white',activebackground='#242628', image=Jurassic_World)
+    Jurassic_World_B.place(x=15, y=75)
+
+    BULLET_TRAIN_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Bullet Train",font=('Simplified Arabic', 14), fg='white', activebackground='#242628',image=BULLET_TRAIN)
+    BULLET_TRAIN_B.place(x=395, y=75)
+
+    BOOSTER_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Ultimate Booster",font=('Simplified Arabic', 14), fg='white', activebackground='#242628', image=BOOSTER)
+    BOOSTER_B.place(x=775, y=75)
+
+    JOP_SIMULATOR_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Job Simulator",font=('Simplified Arabic', 14), fg='white', activebackground='#242628',image=JOP_SIMULATOR)
+    JOP_SIMULATOR_B.place(x=1155, y=75)
+
+    ROBORECALL_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Robo Recall",font=('Simplified Arabic', 14), fg='white', activebackground='#242628', image=ROBORECALL)
+    ROBORECALL_B.place(x=1535, y=75)
+
+    RICHIES_PLANK_B = Button(root, borderwidth=0, bg='#242628', compound="top",text="Richie's Plank ", font=('Simplified Arabic', 14), fg='white',activebackground='#242628', image=RICHIES_PLANK)
+    RICHIES_PLANK_B.place(x=15, y=325)
+
+    FACE_YOUR_FEARS_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Face Your Fears",font=('Simplified Arabic', 14), fg='white', activebackground='#242628',image=FACE_YOUR_FEARS)
+    FACE_YOUR_FEARS_B.place(x=395, y=325)
+
+    Spider_Man_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Spider Man",font=('Simplified Arabic', 14), fg='white', activebackground='#242628', image=Spider_MAN)
+    Spider_Man_B.place(x=775, y=325)
+
+    Over_Take_VR_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Over Take VR",font=('Simplified Arabic', 14), fg='white', activebackground='#242628',image=OVER_Take_VR)
+    Over_Take_VR_B.place(x=1155, y=325)
+
+    COASTER_B = Button(root, borderwidth=0, bg='#242628', compound="top", text="Coaster",font=('Simplified Arabic', 14), fg='white', activebackground='#242628', image=COASTER)
+    COASTER_B.place(x=1535, y=325)
+
+
+
+bg_masrt_F = Frame(root, width=1920, height=1300, bg="#242628").place(x=0, y=0)
+Logo_L = Label(root, width=1920, height=70, bg="#0453a2", image=meta).place(x=0, y=0)
+
+# next_B = Button(root, borderwidth=0, bg='#0453a2', width=1, text=" ▶ ", font=('', 25), fg='white',
+#                 activebackground='#0453a2', activeforeground="white", command=Tap2).place(x=60, y=6)
+
+login_B = customtkinter.CTkButton(master=root, fg_color="#0453a2", bg_color="#0453a2", hover_color="#03478c",text="Login",
+                text_font=('', 14, ""), text_color="white", command=login).place(x=1700,y=23)
+
+clos_B = customtkinter.CTkButton(master=root, width=1, height=1, fg_color="#0453a2", bg_color="#0453a2", hover_color="red",
+                text="✖", text_font=('', 14, ""), text_color="white", command=destroy).place(x=1855,y=23)
+
+home_B = Button(root, borderwidth=0, bg='#0453a2', width=3, height=1, text=" 🔳 ", font=('', 25), fg='white',
+                activebackground='#0453a2', activeforeground="white", command=Tap1).place(x=60, y=2)
+
+
+
+Tap1()
 root.mainloop()
+
+
+
+
+
+
+
+
+
